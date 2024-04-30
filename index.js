@@ -98,7 +98,7 @@ app.post('/api/shorturl', (req, res) => {
 
   // Validate the url
   dns.lookup(param, (err, ip) => {
-    if (err) return console.error(err);
+    if (err) return res.json({ error: 'invalid url' });
     short = genShorturl();
     jsonObj = {original_url: input, short_url: short};
     dataManager("save", jsonObj);
@@ -113,16 +113,11 @@ app.get('/api/shorturl/:shorturl', (req,res) => {
   //check if short url already exist
   let shortExist  = all_Data.map(d => d.short_url);
   let check_short = shortExist.includes(input);
-  console.log("iniput:", input, typeof(input));
-  console.log("check short:", check_short);
-  console.log("shortExist: ", shortExist);
+
   if (check_short && all_Data != undefined) {
     data_found = all_Data[shortExist.indexOf(input)];
     // res.json({data : data_found, short : input, existing : shortExist});
-    // res.redirect(301, data_found.original_url);
-    res.setHeader(data_found.original_url);
-    res.end();
-    console.log("found, redir", data_found);
+    res.redirect(data_found.original_url);
   }
   else {
     res.json({data : 'No matching data', short : input, existing : shortExist});
